@@ -2,6 +2,16 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
+
+function findFunctionName (line) {
+    const FUNCTION_LENGTH = 8;
+    const functionNamePosition = line.search('function') + FUNCTION_LENGTH;
+
+    line = line.substr(functionNamePosition);
+    const wordArray = line.split('(');
+    return wordArray[0].trim();
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -29,6 +39,8 @@ function activate(context) {
                 const uri = Uri.file(file.fileName);
                 const documentData = window.activeTextEditor.document;
                 let startOfFunction = false;
+                let functionName = '';
+                let numInsertedLines = 0;
 
                 console.log('document is', documentData.getText());
 
@@ -38,10 +50,12 @@ function activate(context) {
 
                         const startColumn = line.search(/[^ ]/);
 
-                        edit.insert(uri, new Position(i, startColumn), `console.log('in some function')\n${" ".repeat(startColumn)}`);
+                        edit.insert(uri, new Position(i, startColumn), `console.log('${functionName} line ${i + 1 + numInsertedLines}');\n${" ".repeat(startColumn)}`);
                         startOfFunction = false;
+                        numInsertedLines++;
                     }
                     if (line.includes('function')){
+                        functionName = findFunctionName(line);
                         startOfFunction = true;
                     }
                 }
