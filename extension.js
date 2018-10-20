@@ -30,10 +30,15 @@ function activate(context) {
                 const documentData = window.activeTextEditor.document;
                 let startOfFunction = false;
 
+                console.log('document is', documentData.getText());
+
                 for (let i = 0; i < documentData.lineCount; i++){
                     const line = documentData.lineAt(i).text;
                     if (startOfFunction){
-                        edit.insert(uri, new Position(i, 0), "console.log('in some function')\n");
+
+                        const startColumn = line.search(/[^ ]/);
+
+                        edit.insert(uri, new Position(i, startColumn), `console.log('in some function')\n${" ".repeat(startColumn)}`);
                         startOfFunction = false;
                     }
                     if (line.includes('function')){
