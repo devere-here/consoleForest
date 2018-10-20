@@ -3,13 +3,33 @@
 const vscode = require('vscode');
 
 
-function findFunctionName (line) {
+function getFunctionInfo (line) {
     const FUNCTION_LENGTH = 8;
     const functionNamePosition = line.search('function') + FUNCTION_LENGTH;
+    const substring = line.substr(functionNamePosition).trim();
+    const wordArray = substring.split(/[ (),]/);
+    const functionInfo = {};
 
-    line = line.substr(functionNamePosition);
-    const wordArray = line.split('(');
-    return wordArray[0].trim();
+    functionInfo.functionName = wordArray[0];
+    functionInfo.params = [];
+
+    for (let i = 1; i < wordArray.length; i++){
+        if (wordArray[i] === '{') break;
+        else if (wordArray[i] !== '') functionInfo.params.push(wordArray[i])
+    }
+    return functionInfo;
+};
+
+function createConsoleString (functionInfo, i, numInsertedLines) {
+    const { functionName, params } = functionInfo;
+
+    let str = `'${functionName} line ${i + 1 + numInsertedLines}'`;
+
+    params.forEach(param => {
+        str += `, '${param}', ${param}`;
+    })
+
+    return str;
 }
 
 // this method is called when your extension is activated
@@ -39,23 +59,22 @@ function activate(context) {
                 const uri = Uri.file(file.fileName);
                 const documentData = window.activeTextEditor.document;
                 let startOfFunction = false;
-                let functionName = '';
+                let functionInfo;
                 let numInsertedLines = 0;
-
-                console.log('document is', documentData.getText());
 
                 for (let i = 0; i < documentData.lineCount; i++){
                     const line = documentData.lineAt(i).text;
                     if (startOfFunction){
-
                         const startColumn = line.search(/[^ ]/);
+                        const consoleStr = createConsoleString(functionInfo, i, numInsertedLines);
 
-                        edit.insert(uri, new Position(i, startColumn), `console.log('${functionName} line ${i + 1 + numInsertedLines}');\n${" ".repeat(startColumn)}`);
+                        edit.insert(uri, new Position(i, startColumn), `console.log(${consoleStr});\n${" ".repeat(startColumn)}`);
+
                         startOfFunction = false;
                         numInsertedLines++;
                     }
                     if (line.includes('function')){
-                        functionName = findFunctionName(line);
+                        functionInfo = getFunctionInfo(line);
                         startOfFunction = true;
                     }
                 }
