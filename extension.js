@@ -1,7 +1,6 @@
 // T:re the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
-const fs = require('fs');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -9,30 +8,49 @@ function activate(context) {
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "hello-world" is now active!');
+    console.log('Congratulations, your extension "console forest" is now active!');
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', function () {
+
+
+    let forest = vscode.commands.registerCommand('extension.forest', function () {
         // The code you place here will be executed every time your command is executed
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World fool!');
-        // console.log('vscode.workspace.textDocuments', vscode.workspace.textDocuments);
-        console.log('about to go in forEach');
-        vscode.workspace.textDocuments.forEach(file => {
+        const { window, workspace } = vscode;
+
+        window.showInformationMessage('Hello World fool!');
+
+        workspace.textDocuments.forEach(file => {
             if (file.languageId === 'javascript') {
-                let edit = new vscode.WorkspaceEdit();
-                let uri = vscode.Uri.file(file.fileName);
-                edit.insert(uri, new vscode.Position(0, 0), "`use strict`\n");
-                vscode.workspace.applyEdit(edit);
-                console.log('file is', file);
+                const { WorkspaceEdit, Position, Uri } = vscode;
+                const edit = new WorkspaceEdit();
+                const uri = Uri.file(file.fileName);
+                const documentData = window.activeTextEditor.document;
+                let startOfFunction = false;
+
+                for (let i = 0; i < documentData.lineCount; i++){
+                    const line = documentData.lineAt(i).text;
+                    if (startOfFunction){
+                        edit.insert(uri, new Position(i, 0), "console.log('in some function')\n");
+                        startOfFunction = false;
+                    }
+                    if (line.includes('function')){
+                        startOfFunction = true;
+                    }
+                }
+                workspace.applyEdit(edit);
             }
         })
     });
 
-    context.subscriptions.push(disposable);
+    let deforest = vscode.commands.registerCommand('extension.deforest', function () {
+        console.log('deforestation!');
+    });
+
+    context.subscriptions.push(forest);
+    context.subscriptions.push(deforest);
 }
 exports.activate = activate;
 

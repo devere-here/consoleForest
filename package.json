@@ -11,14 +11,19 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.forest",
+        "onCommand:extension.deforest"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "extension.forest",
+                "title": "Forest"
+            },
+            {
+                "command": "extension.deforest",
+                "title": "Deforest"
             }
         ]
     },
