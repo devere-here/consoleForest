@@ -12,7 +12,9 @@
     ],
     "activationEvents": [
         "onCommand:extension.forest",
-        "onCommand:extension.deforest"
+        "onCommand:extension.deforest",
+        "onCommand:extension.react",
+        "onCommand:extension.idle"
     ],
     "main": "./extension",
     "contributes": {
@@ -24,6 +26,14 @@
             {
                 "command": "extension.deforest",
                 "title": "Deforest"
+            },
+            {
+                "command": "extension.react",
+                "title": "React"
+            },
+            {
+                "command": "extension.idle",
+                "title": "Idle"
             }
         ]
     },
