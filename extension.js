@@ -1,6 +1,7 @@
 // T:re the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const { react, idle } = require('./react');
 
 
 function getFunctionInfo (line) {
@@ -89,6 +90,8 @@ function activate(context) {
 
     context.subscriptions.push(forest);
     context.subscriptions.push(deforest);
+    context.subscriptions.push(react);
+    context.subscriptions.push(idle);
 }
 exports.activate = activate;
 
